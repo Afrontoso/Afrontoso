@@ -1,0 +1,4 @@
+ascii_art.txt
+process_ascii.py
+cache/*.txt
+!cache/requirements.txt
