@@ -242,7 +242,7 @@ def cache_builder(edges, comment_size, force_cache, loc_add=0, loc_del=0):
     data = data[comment_size:] # remove those lines
     for index in range(len(edges)):
         repo_hash, commit_count, *__ = data[index].split()
-        if edges[index]['node'] is None:
+        if edges[index] is None or edges[index]['node'] is None:
             continue
         if repo_hash == hashlib.sha256(edges[index]['node']['nameWithOwner'].encode('utf-8')).hexdigest():
             try:
@@ -275,7 +275,7 @@ def flush_cache(edges, filename, comment_size):
     with open(filename, 'w') as f:
         f.writelines(data)
         for node in edges:
-            if node['node'] is not None:
+            if node is not None and node['node'] is not None:
                 f.write(hashlib.sha256(node['node']['nameWithOwner'].encode('utf-8')).hexdigest() + ' 0 0 0 0\n')
 
 
@@ -316,7 +316,7 @@ def stars_counter(data):
     """
     total_stars = 0
     for node in data:
-        if node['node'] is not None:
+        if node is not None and node['node'] is not None:
             total_stars += node['node']['stargazers']['totalCount']
     return total_stars
 
