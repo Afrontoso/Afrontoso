@@ -220,6 +220,7 @@ def cache_builder(edges, comment_size, force_cache, loc_add=0, loc_del=0):
     Checks each repository in edges to see if it has been updated since the last time it was cached
     If it has, run recursive_loc on that repository to update the LOC count
     """
+    edges = [e for e in edges if e is not None and e['node'] is not None]
     cached = True # Assume all repositories are cached
     filename = 'cache/'+hashlib.sha256(USER_NAME.encode('utf-8')).hexdigest()+'.txt' # Create a unique filename for each user
     try:
@@ -242,8 +243,6 @@ def cache_builder(edges, comment_size, force_cache, loc_add=0, loc_del=0):
     data = data[comment_size:] # remove those lines
     for index in range(len(edges)):
         repo_hash, commit_count, *__ = data[index].split()
-        if edges[index] is None or edges[index]['node'] is None:
-            continue
         if repo_hash == hashlib.sha256(edges[index]['node']['nameWithOwner'].encode('utf-8')).hexdigest():
             try:
                 if int(commit_count) != edges[index]['node']['defaultBranchRef']['target']['history']['totalCount']:
@@ -275,8 +274,7 @@ def flush_cache(edges, filename, comment_size):
     with open(filename, 'w') as f:
         f.writelines(data)
         for node in edges:
-            if node is not None and node['node'] is not None:
-                f.write(hashlib.sha256(node['node']['nameWithOwner'].encode('utf-8')).hexdigest() + ' 0 0 0 0\n')
+            f.write(hashlib.sha256(node['node']['nameWithOwner'].encode('utf-8')).hexdigest() + ' 0 0 0 0\n')
 
 
 def add_archive():
@@ -316,7 +314,7 @@ def stars_counter(data):
     """
     total_stars = 0
     for node in data:
-        if node is not None and node['node'] is not None:
+        if node is not None and node.get('node') is not None:
             total_stars += node['node']['stargazers']['totalCount']
     return total_stars
 
